@@ -4,11 +4,11 @@ const { ccclass, property } = _decorator;
 @ccclass('SuperHtmlTools')
 export class SuperHtmlTools {
 
-    private readonly androidLink: string = "https://play.google.com/store/apps/details?id=com.custom.goescape&hl=en_US";
-    private readonly iosLink: string = "https://apps.apple.com/us/app/go-escape-casual-ball-games/id1435951901";
+    private static readonly androidLink: string = "https://play.google.com/store/apps/details?id=com.custom.goescape&hl=en_US";
+    private static readonly iosLink: string = "https://apps.apple.com/us/app/go-escape-casual-ball-games/id1435951901";
 
 
-    public ToStore() {
+    public static ToStore() {
 
         const buildTypes = {
             SUPER_HTML: 'super-html'

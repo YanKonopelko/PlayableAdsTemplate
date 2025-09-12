@@ -1,8 +1,12 @@
-import { Component, _decorator, Node, Size, Vec2, Vec3, equals, math, CCBoolean, size, clamp } from "cc";
+import { Component, _decorator, Node, Size, Vec2, Vec3, equals, math, CCBoolean, size, clamp, ResolutionPolicy } from "cc";
 import { TimeUtils } from "./TimeUtils";
 import { UITransform } from "cc";
 import { UITransformComponent } from "cc";
 import { AdaptiveWidget } from "./AdaptiveWidget";
+import { EDITOR_NOT_IN_PREVIEW } from "cc/env";
+import { Canvas } from "cc";
+import { view } from "cc";
+import { director } from "cc";
 const { ccclass, property,executeInEditMode } = _decorator;
 
 
@@ -14,12 +18,17 @@ export enum EOrientationType{
 @ccclass('WindowsScaler')
 // @executeInEditMode(true)
 export class WindowsScaler extends Component {
+    @property(UITransform) private canvasTransform:UITransform = null;
+    // @property(Canvas) private canvas:Canvas = null;
+    @property(Size) private baseSize:Size = null;
+    // @property(Size) private gameSize:Size = null;
     private static instance: WindowsScaler = null;
     public static get Instance() {
         return WindowsScaler.instance;
     }
     private allListeners: AdaptiveWidget[] = [];
-    private readonly baseSize: Size = new Size(1280, 720);
+    // private  baseSize: Size = new Size(1280, 720);
+    private lastGameSize:Size = null;
     private lastWindowSize: Size = null;
     private baseRatio: number = 1;
     private curRatio: number;
@@ -51,10 +60,25 @@ export class WindowsScaler extends Component {
     protected start(): void {
         WindowsScaler.instance = this;
         this.baseRatio = this.baseSize.x / this.baseSize.y;
+        // this.lastGameSize = this.gameSize;
     }
     protected update(dt: number): void {
-        const windowInnerWidth = window.innerWidth;
-        const windowInnerHeight = window.innerHeight;
+        var windowInnerWidth = window.innerWidth;
+        var windowInnerHeight = window.innerHeight;
+
+        // if(!this.EqualSize(this.lastGameSize,this.gameSize)){
+        //     this.lastGameSize = this.gameSize;
+        //     view.setDesignResolutionSize(this.gameSize.width,this.gameSize.height,3);
+        //     // director.loadScene("TestScene");
+        // }
+
+        // this.canvas
+
+        if(EDITOR_NOT_IN_PREVIEW && this.canvasTransform){
+            windowInnerWidth = this.canvasTransform.contentSize.x;
+            windowInnerHeight = this.canvasTransform.contentSize.y;
+        }
+
         let curWindowSize: Size = new Size(windowInnerWidth, windowInnerHeight);
         if (!this.lastWindowSize || !this.EqualSize(curWindowSize, this.lastWindowSize)) {
             this.curRatio = curWindowSize.x / curWindowSize.y;
@@ -73,6 +97,7 @@ export class WindowsScaler extends Component {
             this.windowSizeInCanvas = new Vec2(this.orientation == EOrientationType.Horizontal ? ((curWindowSize.width) * (this.baseSize.height / curWindowSize.height)) : this.baseSize.width, this.Orientation == EOrientationType.Vertical ? ((curWindowSize.height) * (this.baseSize.width / curWindowSize.width)) : this.baseSize.height);
 
             this.lastWindowSize = curWindowSize;
+            console.log(`New Window Size: ${curWindowSize}`)
             this.upd();
 
         }
