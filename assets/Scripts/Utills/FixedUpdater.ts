@@ -3,24 +3,8 @@ import { TimeUtils } from "./TimeUtils";
 export class FixedUpdateUtils {
     constructor() {
         const canvas = document.getElementById('GameCanvas') as HTMLCanvasElement;
-
-        // canvas?.addEventListener("focus", this.OnFocus.bind(this));
-        // canvas?.addEventListener("blur", this.OnBlur.bind(this));
-
-        // AdsManager.Instance.OnAdsStart.on("OnAdsStart", this.OnBlur.bind(this));
-        // AdsManager.Instance.OnAdsStart.on("OnAdsStartFailed", this.OnFocus.bind(this));
-
-        // @ts-ignore
-        if (typeof ysdk != typeof undefined) {
-            // @ts-ignore
-            ysdk.on('game_api_pause', this.OnBlur.bind(this)); // Подписка на события 'game_api_pause'.
-            // @ts-ignore
-            ysdk.on('game_api_resume', this.OnFocus.bind(this)); // Подписка на события 'game_api_resume'.
-        }
-        else {
-            canvas?.addEventListener("focus", this.OnFocus.bind(this));
-            canvas?.addEventListener("blur", this.OnBlur.bind(this));
-        }
+        canvas?.addEventListener("focus", this.OnFocus.bind(this));
+        canvas?.addEventListener("blur", this.OnBlur.bind(this));
     }
 
 
@@ -79,19 +63,13 @@ export class FixedUpdateUtils {
         }
     }
 
-    private lastMusicState: boolean = false;
     private OnFocus(any) {
         if (this.canUpd) return;
-        // GlobalContext.AudioController.musicEnabled = this.lastMusicState;
-        // GlobalContext.AudioController.soundMuted = !this.lastMusicState;
         this.canUpd = true;
     }
 
     private OnBlur(any) {
         if (!this.canUpd) return;
-        // this.lastMusicState = GlobalContext.AudioController.musicEnabled;
-        // GlobalContext.AudioController.musicEnabled = false;
-        // GlobalContext.AudioController.soundMuted = true;
         this.canUpd = false;
     }
 }

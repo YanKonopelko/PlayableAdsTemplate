@@ -1,10 +1,11 @@
 import { _decorator, Component, Node } from 'cc';
-import { ESoundType, SoundPreset } from './SoundPreset';
 import { AudioSource } from 'cc';
 import { director } from 'cc';
 import { AudioClip } from 'cc';
 import { NodeEventType } from 'cc';
-import { TimeUtils } from './TimeUtils';
+import { TimeUtils } from '../Utills/TimeUtils';
+import { GameplayScene } from '../GameplayScene';
+import { ESoundType, SoundPreset } from './SoundPreset';
 const { ccclass, property } = _decorator;
 
 @ccclass('SoundDataBase')
@@ -31,6 +32,10 @@ export class SoundDataBase extends Component {
     }
     public set soundMuted(value) {
         this._soundMuted = value;
+        this.stopableSources.forEach(element => {
+            element.volume = !value?0.3:0;
+        });
+        // Выключить все останавливаемые звуки
         if (!value) this.soundSource.volume = 0;
 
     }
@@ -77,7 +82,7 @@ export class SoundDataBase extends Component {
         });
     }
 
-    public Play(type: ESoundType, isStopable: boolean = false) {
+    public Play(type: ESoundType, isStopable: boolean = false,isLoop:boolean = false) {
         let preset = this.presetMap.get(type);
         if (!preset) {
             console.warn(`Have no presets for type: ${type}`);
@@ -90,7 +95,7 @@ export class SoundDataBase extends Component {
         }
 
         if (isStopable) {
-            this.PlayStopableSound(preset);
+            this.PlayStopableSound(preset,isLoop);
         }
         else {
             this.PlayLocal(preset);
@@ -100,10 +105,9 @@ export class SoundDataBase extends Component {
 
 
     private PlayLocal(preset: SoundPreset) {
-        if (this._soundMuted) return;
+        if (this._soundMuted || GameplayScene.paused) return;
         let clip: AudioClip = preset.clip;
         let volume: number = preset.volume;
-
         if (clip == null)
             return;
 
@@ -142,7 +146,7 @@ export class SoundDataBase extends Component {
 
     private currentMusic: ESoundType = null;
     private PlayMusicLocal(preset: SoundPreset) {
-        if (!this._musicEnabled) return;
+        if (!this._musicEnabled || GameplayScene.paused) return;
 
         let clip: AudioClip = preset.clip;
         let volume: number = preset.volume;
@@ -164,8 +168,8 @@ export class SoundDataBase extends Component {
 
     private stopableSoundsSources: AudioSource[] = [];
 
-    private async PlayStopableSound(preset: SoundPreset) {
-        if (this._soundMuted) return;
+    private async PlayStopableSound(preset: SoundPreset,isLoop:boolean = false) {
+        if (this._soundMuted || GameplayScene.paused) return;
         let clip: AudioClip = preset.clip;
         let volume: number = preset.volume;
 
@@ -200,9 +204,10 @@ export class SoundDataBase extends Component {
         this.stopableSources.set(preset.soundType, source);
         source.volume = volume;
         source.clip = clip;
+        source.loop = isLoop
         source.play();
         await TimeUtils.TimeoutSeconds(clip.getDuration());
-        if (source.clip != null && clip == source.clip) {
+        if (source.clip != null && clip == source.clip && !isLoop) {
             this.StopStopableSound(preset.soundType);
         }
     }
@@ -215,5 +220,11 @@ export class SoundDataBase extends Component {
             this.stopableSources.delete(type);
         }
     }
-
+    public StopAllSounds(){
+          this.stopableSources.forEach(element => {
+            element.stop();
+            element.clip = null;
+        });
+        this.stopableSources = new Map<ESoundType, AudioSource>();
+    }
 }

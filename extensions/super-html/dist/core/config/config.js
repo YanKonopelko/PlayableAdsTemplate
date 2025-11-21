@@ -98,6 +98,11 @@ class config {
                 b_html_compression: true,
             },
             {
+                s_name: "ironsourcemraid",
+                b_enable: true,
+                b_html_compression: true,
+            },
+            {
                 s_name: "mintegral",
                 b_enable: true,
                 b_html_compression: false,

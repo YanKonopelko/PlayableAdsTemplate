@@ -63,7 +63,6 @@ class build {
         await this.run();
         utils_1.default.log(`run time ${(new Date().getTime() - i_time) / 1000}S`);
         utils_1.default.log("-- end -- ");
-        Editor.Message.broadcast('super-html:done');
         this.cb && this.cb();
     }
     async run() {

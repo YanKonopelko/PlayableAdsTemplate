@@ -1,5 +1,4 @@
 import { CCFloat, Component, Node, math, Vec2, Vec3, _decorator } from 'cc';
-import { VoidCallbackType } from './Callbacks';
 import { TimeUtils } from './TimeUtils';
 const { ccclass, property } = _decorator;
 
@@ -66,7 +65,7 @@ export class FlyingObject extends Component {
         return this;
     }
 
-    public Init(startPosition: Vec2, destPosition: Vec2, onComplete: VoidCallbackType, delay: number = -1, duration: number = -1): void {
+    public Init(startPosition: Vec2, destPosition: Vec2, onComplete: ()=>void, delay: number = -1, duration: number = -1): void {
         if (duration < 0) {
             duration = this.defaultDuration;
         }
@@ -190,7 +189,7 @@ export class FlyingObject extends Component {
     protected OnFlyTick(): void {
     }
 
-    private async Fly(onComplete: VoidCallbackType): Promise<void> {
+    private async Fly(onComplete: ()=>void): Promise<void> {
         this.BeginFly();
 
         if (this.duration > 0) {

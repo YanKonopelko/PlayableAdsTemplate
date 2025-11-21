@@ -3,7 +3,7 @@ import { CCBoolean } from "cc";
 import { CCInteger } from "cc";
 import { Enum } from "cc";
 import { AudioClip, CCFloat, _decorator } from "cc";
-import { Utils } from "./Utils";
+import { Utils } from "../Utills/Utils";
 
 const { ccclass, property } = _decorator;
 
