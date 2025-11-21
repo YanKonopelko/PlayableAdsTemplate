@@ -9,6 +9,7 @@ const { ccclass, property } = _decorator;
 
 export enum ESoundType{
     None,
+    Music,
 }
 
 @ccclass('SoundPreset')

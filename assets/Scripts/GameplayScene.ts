@@ -9,7 +9,11 @@ const { ccclass, property, requireComponent, executeInEditMode } = _decorator;
 @(ccclass("GameplayScene"))
 export class GameplayScene extends Component {
     public static paused: boolean = false;
-    protected start(): void {
+
+    private tapCount = 3;
+    private readonly androidLink: string = "https://play.google.com/store/apps/details?id=com.rockbite.zombieoutpost";
+    private readonly iosLink: string = "https://apps.apple.com/us/app/idle-outpost-zombie-apocalypse/id6463128982";
+    protected async start(): Promise<void> {
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 GameplayScene.paused = true;
@@ -19,10 +23,65 @@ export class GameplayScene extends Component {
                 console.log("RESUME: вкладка активна");
             }
         });
+        await SoundDataBase.Instance.Init();
+        SoundDataBase.Instance.PlayMusic(ESoundType.Music);
     }
 
-    public PlaySound(){
+    public PlaySound() {
         SoundDataBase.Instance.Play(ESoundType.None);
+        this.ToStore();
+    }
+
+    public ToStore() {
+
+        const buildTypes = {
+            SUPER_HTML: 'super-html'
+        };
+
+        const platformTypes = {
+            APPLOVIN: 'applovin'
+        };
+
+
+        let buildMachine = 'No Build';
+        let platform = 'develop';
+        //@ts-ignore
+        if (window.super_html_channel) {
+            buildMachine = buildTypes.SUPER_HTML;
+            //@ts-ignore
+            platform = window.super_html_channel;
+        }
+
+        const userAgent = navigator.userAgent || navigator.vendor;
+        let link = this.iosLink;
+        if (/android/i.test(userAgent)) {
+            link = this.androidLink;
+        }
+
+        //@ts-ignore
+        if (buildMachine === buildTypes.SUPER_HTML && window.super_html !== undefined) {
+            //@ts-ignore
+
+            if (platform === platformTypes.APPLOVIN && window.mraid === undefined) {
+                window.open(link);
+            } else {
+                //@ts-ignore
+                super_html.appstore_url = this.iosLink;
+                //@ts-ignore
+
+                super_html.google_play_url = this.androidLink;
+                //@ts-ignore
+
+                window.super_html.download();
+            }
+        } else {
+            window.open(link);
+        }
+        // if()
+        //@ts-ignore
+        if (window.gameEnd)
+            //@ts-ignore
+            window.gameEnd && window.gameEnd();
     }
 }
 
