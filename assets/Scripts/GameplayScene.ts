@@ -1,5 +1,5 @@
 import { _decorator, Component, Enum, Vec2, Vec3, Widget, Node } from 'cc';
-import { SoundDataBase } from './Sounds/SoundDataBase';
+import { SoundManager } from './Sounds/SoundManager';
 import { ESoundType } from './Sounds/SoundPreset';
 
 
@@ -23,12 +23,12 @@ export class GameplayScene extends Component {
                 console.log("RESUME: вкладка активна");
             }
         });
-        await SoundDataBase.Instance.Init();
-        SoundDataBase.Instance.PlayMusic(ESoundType.Music);
+        await SoundManager.Instance.Init();
+        SoundManager.Instance.PlayMusic(ESoundType.Music);
     }
 
     public PlaySound() {
-        SoundDataBase.Instance.Play(ESoundType.None);
+        SoundManager.Instance.Play(ESoundType.None);
         this.ToStore();
     }
 

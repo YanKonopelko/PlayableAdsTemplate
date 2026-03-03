@@ -109,7 +109,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "SoundDatabase",
+    "_name": "SoundManager",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
