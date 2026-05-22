@@ -282,7 +282,7 @@
     "_id": "acvGTTeNZKartdOmm//Qv7"
   },
   {
-    "__type__": "ddc76ZbmL9AdI143glfFJHo",
+    "__type__": "2827db7EpRE5r7HKr4SWFcu",
     "_name": "",
     "_objFlags": 0,
     "__editorExtras__": {},
@@ -305,20 +305,20 @@
     "soundSource": {
       "__id__": 7
     },
-    "_id": "ddnQXCa8hAJ6ros0cEBAXC"
+    "_id": "b1XtX7Y15MF61eUIjjbaR2"
   },
   {
     "__type__": "SoundPreset",
-    "soundType": 0,
-    "PathPlusSoundName": "None Sound",
+    "soundType": 1,
+    "PathPlusSoundName": "Jopa/Music",
     "bundleName": "Audio",
     "isNecessary": true,
     "volume": 0.5
   },
   {
     "__type__": "SoundPreset",
-    "soundType": 1,
-    "PathPlusSoundName": "Jopa/Music",
+    "soundType": 0,
+    "PathPlusSoundName": "None Sound",
     "bundleName": "Audio",
     "isNecessary": true,
     "volume": 0.5
@@ -399,8 +399,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 1140.6802721088436
+      "width": 1514.3434343434344,
+      "height": 1280
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -443,8 +443,8 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 640,
-      "y": 359.99999999999994,
+      "x": 360,
+      "y": 640,
       "z": 0
     },
     "_lrot": {
@@ -735,7 +735,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 570.3401360544218,
+    "_orthoHeight": 640,
     "_near": 0,
     "_far": 2000,
     "_color": {

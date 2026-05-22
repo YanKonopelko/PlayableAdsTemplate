@@ -55,8 +55,8 @@ export class SoundManager extends Component {
             this.node.destroy();
             return;
         }
-        this.soundMuted = !window.SoundOn;
-        this.musicEnabled = window.SoundOn;
+        // this.soundMuted = !window.SoundOn;
+        // this.musicEnabled = window.SoundOn;
         SoundManager.instance = this;
         this.presets.forEach(element => {
             this.presetMap.set(element.soundType, element);
