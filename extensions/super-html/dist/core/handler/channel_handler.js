@@ -36,6 +36,7 @@ class channel_handler {
     async run() {
         const s_out_dir = config_1.default.s_out_dir;
         const d_hot = config_1.default.d_hot;
+        const d_super_html_settings = this._get_settings();
         // #### 资源 
         //导入不带压缩的资源
         const s_res_body = `window.__res=${JSON.stringify(d_hot.d_res_cache)};`;
@@ -57,6 +58,7 @@ class channel_handler {
             let d_channel = inject_channel_adapter[key];
             const s_channel_name = d_channel.s_name;
             const s_channel_config_name = d_channel.s_config_name || s_channel_name;
+            const s_build_key = this._get_build_key(d_channel);
             if (!d_channel.b_enable) {
                 continue;
             }
@@ -80,6 +82,7 @@ class channel_handler {
                 if (d_hot.s_title) {
                     s_html_name = `${d_hot.s_title}_${s_html_name}`;
                 }
+                s_html_name = this._get_output_name(d_super_html_settings, s_build_key, "html", s_html_name);
             }
             // zip文件名
             var s_zip_name = d_channel.s_zip_name;
@@ -93,6 +96,7 @@ class channel_handler {
                 if (d_hot.s_title) {
                     s_zip_name = `${d_hot.s_title}_${s_zip_name}`;
                 }
+                s_zip_name = this._get_output_name(d_super_html_settings, s_build_key, "zip", s_zip_name);
             }
             // #### 渠道脚本
             let s_channel_meta = this._get_channel_script(s_channel_config_name, "meta.html");
@@ -108,20 +112,21 @@ class channel_handler {
                 }
             }
             const s_channel_head = this._get_channel_script(s_channel_config_name, "head.js");
+            const s_to_store_body = this._get_to_store_script(s_channel_config_name, s_channel_name);
             const s_channel_body = this._get_channel_script(s_channel_config_name, "script.js");
             let s_out_body = null;
             let l_body = [];
             if (d_channel.b_html_compression) {
                 //分割资源的话，就不打进html，且只有zip下生效
                 if (d_channel.b_split_res) {
-                    l_body = [s_channel_body, s_common_body];
+                    l_body = [s_to_store_body, s_channel_body, s_common_body];
                 }
                 else {
-                    l_body = [s_channel_body, s_zip_res_body, s_common_body];
+                    l_body = [s_to_store_body, s_channel_body, s_zip_res_body, s_common_body];
                 }
             }
             else {
-                l_body = [s_channel_body, s_res_body, s_common_body];
+                l_body = [s_to_store_body, s_channel_body, s_res_body, s_common_body];
             }
             s_out_body = l_body.join("\n");
             let s_html_content = this._add_meta_to_meta(d_hot.s_base_html_content, s_channel_meta);
@@ -223,8 +228,61 @@ class channel_handler {
     _get_channel_script(s_channel_name, s_file_name) {
         // 有配置脚本
         let s_script_path = `channel/${s_channel_name}/${s_file_name}`;
+        const s_disk_path = path_1.default.join(__dirname, "../config", s_script_path);
+        if (fs_1.default.existsSync(s_disk_path)) {
+            return fs_1.default.readFileSync(s_disk_path, "utf8");
+        }
         const s_content = utils_1.default.get_json(s_script_path);
         return s_content || "";
+    }
+    _get_to_store_script(s_channel_config_name, s_channel_name) {
+        const s_to_store_body = this._get_channel_script(s_channel_config_name, "to_store.js") ||
+            this._get_channel_script(s_channel_name, "to_store.js");
+        if (s_to_store_body) {
+            return s_to_store_body;
+        }
+        return `window.ToStore = function(auto = false) {
+    super_log("ToStore " + window.super_html_channel);
+    if (window.super_html && typeof window.super_html.download === "function") {
+        window.super_html.download();
+    }
+};`;
+    }
+    _get_settings_path() {
+        const project_path = (global["Editor"] && ((Editor.Project && Editor.Project.path) || Editor.projectPath)) || "";
+        if (!project_path) {
+            return "";
+        }
+        return path_1.default.join(project_path, "settings", "super-html.json");
+    }
+    _get_settings() {
+        const s_settings_path = this._get_settings_path();
+        if (!s_settings_path || !fs_1.default.existsSync(s_settings_path)) {
+            return {};
+        }
+        try {
+            return JSON.parse(fs_1.default.readFileSync(s_settings_path, "utf8"));
+        }
+        catch (error) {
+            utils_1.default.warn("read settings/super-html.json fail", error.message);
+            return {};
+        }
+    }
+    _get_build_key(d_channel) {
+        const s_channel_name = d_channel.s_name;
+        const s_channel_config_name = d_channel.s_config_name || s_channel_name;
+        const s_variant = d_channel.s_zip_name || d_channel.s_html_name || "";
+        const s_type = d_channel.b_out_zip ? "zip" : "html";
+        return [s_channel_config_name, s_variant, s_type].filter(Boolean).join("__");
+    }
+    _get_output_name(d_settings, s_build_key, s_ext, s_default_name) {
+        const d_build_names = d_settings.build_names || {};
+        const s_custom_name = d_build_names[s_build_key];
+        if (!s_custom_name || !String(s_custom_name).trim()) {
+            return s_default_name;
+        }
+        const s_clean_name = String(s_custom_name).trim().replace(/[<>:"/\\|?*\x00-\x1F]/g, "_");
+        return s_clean_name.toLowerCase().endsWith(`.${s_ext}`) ? s_clean_name : `${s_clean_name}.${s_ext}`;
     }
 }
 exports.default = new channel_handler();

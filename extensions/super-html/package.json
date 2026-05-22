@@ -35,7 +35,7 @@
     },
     "panels": {
         "default": {
-            "title": "super-html Default Panel",
+            "title": "superHtml",
             "main": "dist/3x/panel",
             "size": {
                 "min-width": 1200,

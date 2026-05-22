@@ -69,6 +69,7 @@ class Loose {
 function update_data(data) {
     data.path = data.path || "";
     data.enable_obfuscator = data.enable_obfuscator || false;
+    data.build_names = data.build_names || {};
 }
 exports.default = new class {
     constructor() {
@@ -85,9 +86,20 @@ exports.default = new class {
     }
     get() {
         let data;
+        const s_path = get_path();
+        if (fs.existsSync(s_path)) {
+            try {
+                data = JSON.parse(fs.readFileSync(s_path, "utf8"));
+            }
+            catch (error) {
+                data = null;
+            }
+        }
         try {
-            let super_html_cache = localStorage.getItem("super_html_cache") || "";
-            data = JSON.parse(super_html_cache);
+            if (!data) {
+                let super_html_cache = localStorage.getItem("super_html_cache") || "";
+                data = JSON.parse(super_html_cache);
+            }
         }
         catch (error) {
             data = new dict_data();
@@ -102,6 +114,11 @@ exports.default = new class {
         // }
         try {
             localStorage.setItem("super_html_cache", JSON.stringify(data));
+        }
+        catch (error) {
+        }
+        try {
+            fs.writeFileSync(get_path(), JSON.stringify(data, null, 2));
         }
         catch (error) {
         }
